@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -117,6 +118,16 @@ class GroundedTheme {
   
   /// Primary accent - subtle blue
   static const Color primary = Color(0xFF3B82F6);
+
+  /// Unified dark-mode status bar + navigation bar style.
+  /// Use everywhere so the status bar blends with the 0xFF161616 top bar.
+  static const SystemUiOverlayStyle darkOverlayStyle = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: Color(0xFF000000),
+    systemNavigationBarIconBrightness: Brightness.light,
+  );
   
   /// Secondary accent
   static const Color secondary = Color(0xFF6366F1);

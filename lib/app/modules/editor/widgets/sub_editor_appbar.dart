@@ -1,24 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../../../../generated/locales.g.dart';
 import '../../../core/widgets/glass_icon_button.dart';
 
-/// Premium editor app bar with refined aesthetics
-/// Inspired by Lightroom, VSCO, and professional photo editors
-class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWidget {
-  const MainEditorAppBarCustom({
+/// Unified top bar for sub-editors (Paint, CropRotate, Filter, Tune, Blur).
+///
+/// Mirrors the main editor app bar style so Close / Undo / Redo / Done live
+/// in a single, consistent location across every editing context.
+class SubEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const SubEditorAppBar({
     super.key,
-    required this.editor,
+    required this.onClose,
+    required this.onDone,
+    this.onUndo,
+    this.onRedo,
+    this.canUndo = false,
+    this.canRedo = false,
   });
 
-  final ProImageEditorState editor;
+  final VoidCallback onClose;
+  final VoidCallback onDone;
+  final VoidCallback? onUndo;
+  final VoidCallback? onRedo;
+  final bool canUndo;
+  final bool canRedo;
 
-  /// The height reported to the Scaffold so it reserves the correct amount
-  /// of space for the body. Must match the actual rendered height exactly
-  /// (the package's SafeArea already handles the status-bar inset).
   static const double barHeight = kToolbarHeight + 8;
 
   @override
@@ -26,17 +34,8 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
 
   @override
   Widget build(BuildContext context) {
-    // Hide when a sub-editor (text, paint, …) is open — the sub-editor
-    // provides its own appbar and we must avoid duplicate controls.
-    if (editor.isSubEditorOpen) {
-      return const SizedBox.shrink();
-    }
-
-    final canUndo = editor.canUndo;
-    final canRedo = editor.canRedo;
-    // Status bar height — we pad content below it for edge-to-edge look.
-    // The package's SafeArea(top: false) is set so we handle it here.
     final topPadding = MediaQuery.paddingOf(context).top;
+    final hasUndoRedo = onUndo != null || onRedo != null;
 
     return Container(
       decoration: const BoxDecoration(
@@ -55,39 +54,33 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             children: [
-              // Close button - minimal circle
               GlassIconButton(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  editor.closeEditor();
+                  onClose();
                 },
                 icon: Icons.close_rounded,
                 tooltip: LocaleKeys.common_cancel.tr,
               ),
-
               const Spacer(),
-
-              // Undo/Redo in a connected pill — centered
-              _UndoRedoPill(
-                canUndo: canUndo,
-                canRedo: canRedo,
-                onUndo: () {
-                  HapticFeedback.lightImpact();
-                  editor.undoAction();
-                },
-                onRedo: () {
-                  HapticFeedback.lightImpact();
-                  editor.redoAction();
-                },
-              ),
-
+              if (hasUndoRedo)
+                _UndoRedoPill(
+                  canUndo: canUndo,
+                  canRedo: canRedo,
+                  onUndo: () {
+                    HapticFeedback.lightImpact();
+                    onUndo?.call();
+                  },
+                  onRedo: () {
+                    HapticFeedback.lightImpact();
+                    onRedo?.call();
+                  },
+                ),
               const Spacer(),
-
-              // Done button — clean Grounded style
               GlassIconButton(
                 onTap: () {
                   HapticFeedback.mediumImpact();
-                  editor.doneEditing();
+                  onDone();
                 },
                 icon: Icons.done_rounded,
                 tooltip: LocaleKeys.common_done.tr,
@@ -100,7 +93,6 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
   }
 }
 
-/// Connected undo/redo pill with premium styling
 class _UndoRedoPill extends StatelessWidget {
   const _UndoRedoPill({
     required this.canUndo,
@@ -129,7 +121,6 @@ class _UndoRedoPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Undo
           _PillButton(
             onTap: canUndo ? onUndo : null,
             icon: Icons.undo_rounded,
@@ -137,13 +128,11 @@ class _UndoRedoPill extends StatelessWidget {
             isStart: true,
             tooltip: LocaleKeys.common_undo.tr,
           ),
-          // Subtle divider
           Container(
             width: 1,
             height: 24,
             color: Colors.white.withValues(alpha: 0.15),
           ),
-          // Redo
           _PillButton(
             onTap: canRedo ? onRedo : null,
             icon: Icons.redo_rounded,
@@ -157,7 +146,6 @@ class _UndoRedoPill extends StatelessWidget {
   }
 }
 
-/// Individual button within the undo/redo pill
 class _PillButton extends StatelessWidget {
   const _PillButton({
     required this.onTap,
@@ -193,8 +181,8 @@ class _PillButton extends StatelessWidget {
             alignment: Alignment.center,
             child: Icon(
               icon,
-              color: enabled 
-                  ? Colors.white.withValues(alpha: 0.9) 
+              color: enabled
+                  ? Colors.white.withValues(alpha: 0.9)
                   : Colors.white.withValues(alpha: 0.25),
               size: 20,
             ),
@@ -204,5 +192,3 @@ class _PillButton extends StatelessWidget {
     );
   }
 }
-
-

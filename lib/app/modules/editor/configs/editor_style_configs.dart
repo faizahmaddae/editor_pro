@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:pro_image_editor/designs/grounded/grounded_design.dart';
@@ -14,6 +13,7 @@ import '../widgets/draft_exit_sheet.dart';
 import '../widgets/editor_loading_overlay.dart';
 import '../widgets/main_editor_appbar.dart';
 import '../widgets/main_editor_bottombar.dart';
+import '../widgets/sub_editor_appbar.dart';
 import '../widgets/text_editor_appbar.dart';
 import '../widgets/text_editor_bottom_panel/fonts_tab.dart';
 import '../widgets/text_editor_bottom_panel/shadow_value.dart';
@@ -211,6 +211,10 @@ class EditorStyleConfigs {
         },
         // Hide default remove area since FloatSelect has its own delete button
         removeLayerArea: (a, b, c, d) => const SizedBox.shrink(),
+        // Clip the body so layers with Clip.none don't overflow behind
+        // the bottom toolbar when dragged near the edge.
+        wrapBody: (editor, rebuildStream, content) =>
+            ClipRect(child: content),
         // Floating action buttons (left side)
         bodyItems: (editor, rebuildStream) {
           return [
@@ -304,7 +308,7 @@ class EditorStyleConfigs {
         background: GroundedTheme.backgroundDark,
         bottomBarBackground: GroundedTheme.surfaceDark,
         appBarColor: GroundedTheme.textPrimaryDark,
-        uiOverlayStyle: SystemUiOverlayStyle.light,
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
     );
   }
@@ -324,13 +328,25 @@ class EditorStyleConfigs {
         bottomBarBackground: GroundedTheme.surfaceDark,
         appBarColor: GroundedTheme.textPrimaryDark,
         initialStrokeWidth: 5,
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
       // Custom zoom icon for paint editor
       icons: const PaintEditorIcons(
         moveAndZoom: Icons.pinch_outlined,
       ),
       widgets: PaintEditorWidgets(
-        appBar: (paintEditor, rebuildStream) => null,
+        appBar: (paintEditor, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          appbarSize: const Size.fromHeight(SubEditorAppBar.barHeight),
+          builder: (_) => SubEditorAppBar(
+            onClose: paintEditor.close,
+            onDone: paintEditor.done,
+            onUndo: paintEditor.undoAction,
+            onRedo: paintEditor.redoAction,
+            canUndo: paintEditor.canUndo,
+            canRedo: paintEditor.canRedo,
+          ),
+        ),
         colorPicker: (paintEditor, rebuildStream, currentColor, setColor) =>
             null,
         bottomBar: (editorState, rebuildStream) {
@@ -340,6 +356,7 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
+                showActionBar: false,
                 i18nColor: LocaleKeys.paint_color.tr,
                 showColorPicker: (currentColor) {
                   Color? newColor;
@@ -566,9 +583,21 @@ class EditorStyleConfigs {
         bottomBarBackground: GroundedTheme.surfaceDark,
         appBarColor: GroundedTheme.textPrimaryDark,
         helperLineColor: Color(0x25FFFFFF),
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
       widgets: CropRotateEditorWidgets(
-        appBar: (cropRotateEditor, rebuildStream) => null,
+        appBar: (cropRotateEditor, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          appbarSize: const Size.fromHeight(SubEditorAppBar.barHeight),
+          builder: (_) => SubEditorAppBar(
+            onClose: cropRotateEditor.close,
+            onDone: cropRotateEditor.done,
+            onUndo: cropRotateEditor.undoAction,
+            onRedo: cropRotateEditor.redoAction,
+            canUndo: cropRotateEditor.canUndo,
+            canRedo: cropRotateEditor.canRedo,
+          ),
+        ),
         bottomBar: (cropRotateEditor, rebuildStream) => ReactiveWidget(
           stream: rebuildStream,
           builder: (_) => GroundedCropRotateBar(
@@ -576,6 +605,7 @@ class EditorStyleConfigs {
             callbacks: cropRotateEditor.callbacks,
             editor: cropRotateEditor,
             selectedRatioColor: GroundedTheme.primary,
+            showActionBar: false,
           ),
         ),
       ),
@@ -592,6 +622,7 @@ class EditorStyleConfigs {
         filterListSpacing: 7,
         filterListMargin: EdgeInsets.fromLTRB(8, 0, 8, 8),
         background: GroundedTheme.backgroundDark,
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
       widgets: FilterEditorWidgets(
         slider: (editorState, rebuildStream, value, onChanged, onChangeEnd) =>
@@ -604,7 +635,14 @@ class EditorStyleConfigs {
             activeColor: Colors.blue.shade200,
           ),
         ),
-        appBar: (editorState, rebuildStream) => null,
+        appBar: (editorState, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          appbarSize: const Size.fromHeight(SubEditorAppBar.barHeight),
+          builder: (_) => SubEditorAppBar(
+            onClose: editorState.close,
+            onDone: editorState.done,
+          ),
+        ),
         bottomBar: (editorState, rebuildStream) {
           return ReactiveWidget(
             builder: (context) {
@@ -612,6 +650,7 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
+                showActionBar: false,
               );
             },
             stream: rebuildStream,
@@ -628,9 +667,21 @@ class EditorStyleConfigs {
       style: const TuneEditorStyle(
         background: GroundedTheme.backgroundDark,
         bottomBarBackground: GroundedTheme.surfaceDark,
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
       widgets: TuneEditorWidgets(
-        appBar: (editor, rebuildStream) => null,
+        appBar: (editor, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          appbarSize: const Size.fromHeight(SubEditorAppBar.barHeight),
+          builder: (_) => SubEditorAppBar(
+            onClose: editor.close,
+            onDone: editor.done,
+            onUndo: editor.undo,
+            onRedo: editor.redo,
+            canUndo: editor.canUndo,
+            canRedo: editor.canRedo,
+          ),
+        ),
         bottomBar: (editorState, rebuildStream) {
           return ReactiveWidget(
             builder: (context) {
@@ -638,6 +689,7 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
+                showActionBar: false,
               );
             },
             stream: rebuildStream,
@@ -653,9 +705,17 @@ class EditorStyleConfigs {
       // Editor always uses dark theme
       style: const BlurEditorStyle(
         background: GroundedTheme.backgroundDark,
+        uiOverlayStyle: GroundedTheme.darkOverlayStyle,
       ),
       widgets: BlurEditorWidgets(
-        appBar: (blurEditor, rebuildStream) => null,
+        appBar: (blurEditor, rebuildStream) => ReactiveAppbar(
+          stream: rebuildStream,
+          appbarSize: const Size.fromHeight(SubEditorAppBar.barHeight),
+          builder: (_) => SubEditorAppBar(
+            onClose: blurEditor.close,
+            onDone: blurEditor.done,
+          ),
+        ),
         bottomBar: (editorState, rebuildStream) {
           return ReactiveWidget(
             builder: (context) {
@@ -663,6 +723,7 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
+                showActionBar: false,
               );
             },
             stream: rebuildStream,
