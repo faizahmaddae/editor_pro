@@ -298,6 +298,48 @@ class LocaleKeys {
   static const crop_rotate_square = 'crop_rotate_square';
   static const filter_none = 'filter_none';
   static const filter_original = 'filter_original';
+  static const filter_addictive_blue = 'filter_addictive_blue';
+  static const filter_addictive_red = 'filter_addictive_red';
+  static const filter_aden = 'filter_aden';
+  static const filter_amaro = 'filter_amaro';
+  static const filter_ashby = 'filter_ashby';
+  static const filter_brannan = 'filter_brannan';
+  static const filter_brooklyn = 'filter_brooklyn';
+  static const filter_charmes = 'filter_charmes';
+  static const filter_clarendon = 'filter_clarendon';
+  static const filter_crema = 'filter_crema';
+  static const filter_dogpatch = 'filter_dogpatch';
+  static const filter_earlybird = 'filter_earlybird';
+  static const filter_1977 = 'filter_1977';
+  static const filter_gingham = 'filter_gingham';
+  static const filter_ginza = 'filter_ginza';
+  static const filter_hefe = 'filter_hefe';
+  static const filter_helena = 'filter_helena';
+  static const filter_hudson = 'filter_hudson';
+  static const filter_inkwell = 'filter_inkwell';
+  static const filter_juno = 'filter_juno';
+  static const filter_kelvin = 'filter_kelvin';
+  static const filter_lark = 'filter_lark';
+  static const filter_lo_fi = 'filter_lo_fi';
+  static const filter_ludwig = 'filter_ludwig';
+  static const filter_maven = 'filter_maven';
+  static const filter_mayfair = 'filter_mayfair';
+  static const filter_moon = 'filter_moon';
+  static const filter_nashville = 'filter_nashville';
+  static const filter_perpetua = 'filter_perpetua';
+  static const filter_reyes = 'filter_reyes';
+  static const filter_rise = 'filter_rise';
+  static const filter_sierra = 'filter_sierra';
+  static const filter_skyline = 'filter_skyline';
+  static const filter_slumber = 'filter_slumber';
+  static const filter_stinson = 'filter_stinson';
+  static const filter_sutro = 'filter_sutro';
+  static const filter_toaster = 'filter_toaster';
+  static const filter_valencia = 'filter_valencia';
+  static const filter_vesper = 'filter_vesper';
+  static const filter_walden = 'filter_walden';
+  static const filter_willow = 'filter_willow';
+  static const filter_x_pro_ii = 'filter_x_pro_ii';
   static const tune_brightness = 'tune_brightness';
   static const tune_contrast = 'tune_contrast';
   static const tune_saturation = 'tune_saturation';
@@ -699,8 +741,50 @@ class Locales {
     'crop_rotate_free': 'Free',
     'crop_rotate_original': 'Original',
     'crop_rotate_square': 'Square',
-    'filter_none': 'None',
+    'filter_none': 'No Filter',
     'filter_original': 'Original',
+    'filter_addictive_blue': 'AddictiveBlue',
+    'filter_addictive_red': 'AddictiveRed',
+    'filter_aden': 'Aden',
+    'filter_amaro': 'Amaro',
+    'filter_ashby': 'Ashby',
+    'filter_brannan': 'Brannan',
+    'filter_brooklyn': 'Brooklyn',
+    'filter_charmes': 'Charmes',
+    'filter_clarendon': 'Clarendon',
+    'filter_crema': 'Crema',
+    'filter_dogpatch': 'Dogpatch',
+    'filter_earlybird': 'Earlybird',
+    'filter_1977': '1977',
+    'filter_gingham': 'Gingham',
+    'filter_ginza': 'Ginza',
+    'filter_hefe': 'Hefe',
+    'filter_helena': 'Helena',
+    'filter_hudson': 'Hudson',
+    'filter_inkwell': 'Inkwell',
+    'filter_juno': 'Juno',
+    'filter_kelvin': 'Kelvin',
+    'filter_lark': 'Lark',
+    'filter_lo_fi': 'Lo-Fi',
+    'filter_ludwig': 'Ludwig',
+    'filter_maven': 'Maven',
+    'filter_mayfair': 'Mayfair',
+    'filter_moon': 'Moon',
+    'filter_nashville': 'Nashville',
+    'filter_perpetua': 'Perpetua',
+    'filter_reyes': 'Reyes',
+    'filter_rise': 'Rise',
+    'filter_sierra': 'Sierra',
+    'filter_skyline': 'Skyline',
+    'filter_slumber': 'Slumber',
+    'filter_stinson': 'Stinson',
+    'filter_sutro': 'Sutro',
+    'filter_toaster': 'Toaster',
+    'filter_valencia': 'Valencia',
+    'filter_vesper': 'Vesper',
+    'filter_walden': 'Walden',
+    'filter_willow': 'Willow',
+    'filter_x_pro_ii': 'X-Pro II',
     'tune_brightness': 'Brightness',
     'tune_contrast': 'Contrast',
     'tune_saturation': 'Saturation',
@@ -1097,8 +1181,50 @@ class Locales {
     'crop_rotate_free': 'آزاد',
     'crop_rotate_original': 'اصلی',
     'crop_rotate_square': 'مربع',
-    'filter_none': 'هیچ',
+    'filter_none': 'بدون فیلتر',
     'filter_original': 'اصلی',
+    'filter_addictive_blue': 'آبی اعتیادآور',
+    'filter_addictive_red': 'قرمز اعتیادآور',
+    'filter_aden': 'آدن',
+    'filter_amaro': 'آمارو',
+    'filter_ashby': 'اشبی',
+    'filter_brannan': 'برانن',
+    'filter_brooklyn': 'بروکلین',
+    'filter_charmes': 'شارمز',
+    'filter_clarendon': 'کلارندون',
+    'filter_crema': 'کرما',
+    'filter_dogpatch': 'داگ‌پچ',
+    'filter_earlybird': 'ارلی‌برد',
+    'filter_1977': '۱۹۷۷',
+    'filter_gingham': 'گینگام',
+    'filter_ginza': 'گینزا',
+    'filter_hefe': 'هفه',
+    'filter_helena': 'هلنا',
+    'filter_hudson': 'هادسون',
+    'filter_inkwell': 'اینکول',
+    'filter_juno': 'جونو',
+    'filter_kelvin': 'کلوین',
+    'filter_lark': 'لارک',
+    'filter_lo_fi': 'لو-فای',
+    'filter_ludwig': 'لودویگ',
+    'filter_maven': 'میون',
+    'filter_mayfair': 'می‌فر',
+    'filter_moon': 'ماه',
+    'filter_nashville': 'نشویل',
+    'filter_perpetua': 'پرپچوا',
+    'filter_reyes': 'ریز',
+    'filter_rise': 'رایز',
+    'filter_sierra': 'سیرا',
+    'filter_skyline': 'اسکای‌لاین',
+    'filter_slumber': 'اسلامبر',
+    'filter_stinson': 'استینسون',
+    'filter_sutro': 'سوترو',
+    'filter_toaster': 'توستر',
+    'filter_valencia': 'والنسیا',
+    'filter_vesper': 'وسپر',
+    'filter_walden': 'والدن',
+    'filter_willow': 'ویلو',
+    'filter_x_pro_ii': 'ایکس-پرو ۲',
     'tune_brightness': 'روشنایی',
     'tune_contrast': 'کنتراست',
     'tune_saturation': 'اشباع',

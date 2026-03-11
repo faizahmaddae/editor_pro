@@ -7,13 +7,17 @@ import '../../../core/widgets/glass_icon_button.dart';
 
 /// Unified top bar for sub-editors (Paint, CropRotate, Filter, Tune, Blur).
 ///
-/// Mirrors the main editor app bar style so Close / Undo / Redo / Done live
-/// in a single, consistent location across every editing context.
+/// Visually distinct from the main editor bar:
+/// - **Back** arrow (instead of Close) to return to the main editor
+/// - **Tool title** centered to reinforce which mode the user is in
+/// - **Apply** action (instead of Done) to confirm the sub-tool's changes
+/// - Context-aware Undo / Redo when the sub-editor supports history
 class SubEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SubEditorAppBar({
     super.key,
     required this.onClose,
     required this.onDone,
+    this.toolTitle,
     this.onUndo,
     this.onRedo,
     this.canUndo = false,
@@ -22,6 +26,11 @@ class SubEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final VoidCallback onClose;
   final VoidCallback onDone;
+
+  /// The name of the active tool displayed in the center of the bar.
+  /// When null, the center area shows only the undo/redo pill (if available).
+  final String? toolTitle;
+
   final VoidCallback? onUndo;
   final VoidCallback? onRedo;
   final bool canUndo;
@@ -54,36 +63,59 @@ class SubEditorAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
             children: [
+              // Back button — returns to main editor (distinct from Close)
               GlassIconButton(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   onClose();
                 },
-                icon: Icons.close_rounded,
-                tooltip: LocaleKeys.common_cancel.tr,
+                icon: Icons.arrow_back_rounded,
+                tooltip: LocaleKeys.common_back.tr,
               ),
               const Spacer(),
-              if (hasUndoRedo)
-                _UndoRedoPill(
-                  canUndo: canUndo,
-                  canRedo: canRedo,
-                  onUndo: () {
-                    HapticFeedback.lightImpact();
-                    onUndo?.call();
-                  },
-                  onRedo: () {
-                    HapticFeedback.lightImpact();
-                    onRedo?.call();
-                  },
-                ),
+              // Center area: tool title + undo/redo
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (toolTitle != null)
+                    Text(
+                      toolTitle!,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  if (toolTitle != null && hasUndoRedo)
+                    const SizedBox(height: 2),
+                  if (hasUndoRedo)
+                    _UndoRedoPill(
+                      canUndo: canUndo,
+                      canRedo: canRedo,
+                      onUndo: () {
+                        HapticFeedback.lightImpact();
+                        onUndo?.call();
+                      },
+                      onRedo: () {
+                        HapticFeedback.lightImpact();
+                        onRedo?.call();
+                      },
+                    ),
+                  if (!hasUndoRedo && toolTitle == null)
+                    const SizedBox.shrink(),
+                ],
+              ),
               const Spacer(),
+              // Apply button — confirms this sub-tool's changes
               GlassIconButton(
                 onTap: () {
                   HapticFeedback.mediumImpact();
                   onDone();
                 },
-                icon: Icons.done_rounded,
-                tooltip: LocaleKeys.common_done.tr,
+                icon: Icons.check_rounded,
+                tooltip: LocaleKeys.common_apply.tr,
               ),
             ],
           ),
@@ -109,9 +141,9 @@ class _UndoRedoPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 44,
+      height: 28,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(14),
         color: Colors.white.withValues(alpha: 0.08),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.12),
@@ -130,7 +162,7 @@ class _UndoRedoPill extends StatelessWidget {
           ),
           Container(
             width: 1,
-            height: 24,
+            height: 16,
             color: Colors.white.withValues(alpha: 0.15),
           ),
           _PillButton(
@@ -164,8 +196,8 @@ class _PillButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderRadius = BorderRadiusDirectional.horizontal(
-      start: isStart ? const Radius.circular(22) : Radius.zero,
-      end: !isStart ? const Radius.circular(22) : Radius.zero,
+      start: isStart ? const Radius.circular(14) : Radius.zero,
+      end: !isStart ? const Radius.circular(14) : Radius.zero,
     ).resolve(Directionality.of(context));
 
     return Tooltip(
@@ -176,15 +208,15 @@ class _PillButton extends StatelessWidget {
           onTap: enabled ? onTap : null,
           borderRadius: borderRadius,
           child: Container(
-            width: 48,
-            height: 44,
+            width: 36,
+            height: 28,
             alignment: Alignment.center,
             child: Icon(
               icon,
               color: enabled
                   ? Colors.white.withValues(alpha: 0.9)
                   : Colors.white.withValues(alpha: 0.25),
-              size: 20,
+              size: 16,
             ),
           ),
         ),
