@@ -1,0 +1,276 @@
+name: editor_pro
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management & navigation
+  get: ^4.7.3
+  get_storage: ^2.1.1
+  intl: any
+
+  # pro_image_editor: ^12.0.2
+  # Image editor (local package for development)
+  pro_image_editor:
+    path: packages/pro_image_editor
+  flutter_colorpicker: ^1.1.0
+
+  # Image handling
+  image_picker: ^1.1.2
+  path_provider: ^2.1.5
+  gal: ^2.3.2
+  share_plus: ^10.1.4
+
+  # UI
+  cupertino_icons: ^1.0.8
+  package_info_plus: ^9.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - assets/locales/
+    - assets/fonts/english/
+    - assets/fonts/farsi/
+
+  fonts:
+    # ========== ENGLISH FONTS ==========
+    - family: Barriecito
+      fonts:
+        - asset: assets/fonts/english/Barriecito/Barriecito-Regular.ttf
+    - family: Bungee_Shade
+      fonts:
+        - asset: assets/fonts/english/Bungee_Shade/BungeeShade-Regular.ttf
+    - family: Chivo_Mono
+      fonts:
+        - asset: assets/fonts/english/Chivo_Mono/ChivoMono-Regular.ttf
+    - family: Dancing_Script
+      fonts:
+        - asset: assets/fonts/english/Dancing_Script/DancingScript-Regular.ttf
+    - family: Hanken_Grotesk
+      fonts:
+        - asset: assets/fonts/english/Hanken_Grotesk/HankenGrotesk-Regular.ttf
+    - family: Josefin_Sans
+      fonts:
+        - asset: assets/fonts/english/Josefin_Sans/JosefinSans-Regular.ttf
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/english/Lato/Lato-Regular.ttf
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/english/Lobster/Lobster-Regular.ttf
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/english/Raleway/Raleway-Regular.ttf
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/english/Roboto/Roboto-Regular.ttf
+    - family: Rubik_80s_Fade
+      fonts:
+        - asset: assets/fonts/english/Rubik_80s_Fade/Rubik80sFade-Regular.ttf
+    - family: Rubik_Gemstones
+      fonts:
+        - asset: assets/fonts/english/Rubik_Gemstones/RubikGemstones-Regular.ttf
+    - family: Rubik_Puddles
+      fonts:
+        - asset: assets/fonts/english/Rubik_Puddles/RubikPuddles-Regular.ttf
+    - family: Rubik_Storm
+      fonts:
+        - asset: assets/fonts/english/Rubik_Storm/RubikStorm-Regular.ttf
+    - family: Rubik_Vinyl
+      fonts:
+        - asset: assets/fonts/english/Rubik_Vinyl/RubikVinyl-Regular.ttf
+    - family: Rubik_Wet_Paint
+      fonts:
+        - asset: assets/fonts/english/Rubik_Wet_Paint/RubikWetPaint-Regular.ttf
+    - family: Sevillana
+      fonts:
+        - asset: assets/fonts/english/Sevillana/Sevillana-Regular.ttf
+    - family: Titillium_Web
+      fonts:
+        - asset: assets/fonts/english/Titillium_Web/TitilliumWeb-Regular.ttf
+    - family: Zen_Tokyo_Zoo
+      fonts:
+        - asset: assets/fonts/english/Zen_Tokyo_Zoo/ZenTokyoZoo-Regular.ttf
+
+    # ========== PERSIAN/FARSI FONTS ==========
+    - family: IranNastaliq
+      fonts:
+        - asset: assets/fonts/farsi/IranNastaliq.ttf
+    - family: Eliya
+      fonts:
+        - asset: assets/fonts/farsi/Eliya Regular.ttf
+    - family: a_soraya
+      fonts:
+        - asset: assets/fonts/farsi/A_Soraya.ttf
+    - family: Delbar
+      fonts:
+        - asset: assets/fonts/farsi/Delbar Bold.ttf
+    - family: badkhat
+      fonts:
+        - asset: assets/fonts/farsi/persianـbadkht2.ttf
+    - family: Fedra
+      fonts:
+        - asset: assets/fonts/farsi/Fedra Arabic Display AR LT Black.ttf
+    - family: Ferdosi
+      fonts:
+        - asset: assets/fonts/farsi/Far_Ferdowsi.ttf
+    - family: Leyla
+      fonts:
+        - asset: assets/fonts/farsi/leyla.ttf
+    - family: BNazanin
+      fonts:
+        - asset: assets/fonts/farsi/BNazanin.ttf
+    - family: BTitrBd
+      fonts:
+        - asset: assets/fonts/farsi/BTitrBd.ttf
+    - family: MJ
+      fonts:
+        - asset: assets/fonts/farsi/Mj_SS Three Light.ttf
+    - family: BRoya
+      fonts:
+        - asset: assets/fonts/farsi/BRoya.ttf
+    - family: SOGAND
+      fonts:
+        - asset: assets/fonts/farsi/SOGAND.ttf
+    - family: BTraffic
+      fonts:
+        - asset: assets/fonts/farsi/BTraffic.ttf
+    - family: Vazir
+      fonts:
+        - asset: assets/fonts/farsi/Vazir_Regular.ttf
+    - family: Afsaneh
+      fonts:
+        - asset: assets/fonts/farsi/Afsaneh.ttf
+    - family: Araz
+      fonts:
+        - asset: assets/fonts/farsi/Araz.ttf
+    - family: Casablanca
+      fonts:
+        - asset: assets/fonts/farsi/Casablanca.ttf
+    - family: DimaShekaste
+      fonts:
+        - asset: assets/fonts/farsi/Dima_Shekaste.ttf
+    - family: DimaTahriri
+      fonts:
+        - asset: assets/fonts/farsi/DimaTahriri.ttf
+    - family: Mj_Dinar_Medium
+      fonts:
+        - asset: assets/fonts/farsi/Mj_Dinar_Medium.ttf
+    - family: Flow
+      fonts:
+        - asset: assets/fonts/farsi/Mj_Flow Regular.ttf
+    - family: Ghalam
+      fonts:
+        - asset: assets/fonts/farsi/MjGhalam2.ttf
+    - family: Hesam
+      fonts:
+        - asset: assets/fonts/farsi/W_hesam.ttf
+    - family: Lalezar
+      fonts:
+        - asset: assets/fonts/farsi/Lalezar.ttf
+    - family: Mosalas
+      fonts:
+        - asset: assets/fonts/farsi/Mosalas.ttf
+    - family: Neirizi
+      fonts:
+        - asset: assets/fonts/farsi/Neirizi.ttf
+    - family: A Ordibehesht shablon
+      fonts:
+        - asset: assets/fonts/farsi/A Ordibehesht shablon.TTF
+    - family: Mj_Sayeh_1
+      fonts:
+        - asset: assets/fonts/farsi/Mj_Sayeh_1.ttf
+    - family: Hekayat
+      fonts:
+        - asset: assets/fonts/farsi/Hekayat.ttf
+    - family: ANegaar
+      fonts:
+        - asset: assets/fonts/farsi/ANegaar.ttf
+    - family: b_mitra
+      fonts:
+        - asset: assets/fonts/farsi/B Mitra Bold.ttf
+    - family: Yekan
+      fonts:
+        - asset: assets/fonts/farsi/B Yekan.ttf
+    - family: ARezvan
+      fonts:
+        - asset: assets/fonts/farsi/ARezvan.ttf
+    - family: Iranian Sans
+      fonts:
+        - asset: assets/fonts/farsi/IranianSans.ttf
+    - family: Shabnam
+      fonts:
+        - asset: assets/fonts/farsi/Shabnam.ttf
+    - family: KhatKhati
+      fonts:
+        - asset: assets/fonts/farsi/persian_khat_khati_02.ttf
+    - family: Koodak_1
+      fonts:
+        - asset: assets/fonts/farsi/B Koodak Bold_0.ttf
+    - family: Koodak_2
+      fonts:
+        - asset: assets/fonts/farsi/B Koodak Outline_0.ttf
+    - family: Shams
+      fonts:
+        - asset: assets/fonts/farsi/Shams.ttf
+    - family: Khodkar
+      fonts:
+        - asset: assets/fonts/farsi/Far_khodkar.ttf
+    - family: Samim_Bold
+      fonts:
+        - asset: assets/fonts/farsi/Samim_Bold.ttf
+    - family: Gandom
+      fonts:
+        - asset: assets/fonts/farsi/Gandom.ttf
+    - family: Dirooz
+      fonts:
+        - asset: assets/fonts/farsi/Dirooz.ttf
