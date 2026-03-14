@@ -118,14 +118,14 @@ class _GroundedTextBarCustomState extends State<GroundedTextBarCustom>
     // When enabling shadow, switch to onlyColor (no background)
     if (!wasEnabled && isEnabled) {
       _savedBackgroundMode = widget.editor.backgroundColorMode;
-      // Set to onlyColor to remove background
-      while (widget.editor.backgroundColorMode != LayerBackgroundMode.onlyColor) {
+      // Set to onlyColor to remove background — cap iterations to avoid infinite loop
+      for (int i = 0; i < 5 && widget.editor.backgroundColorMode != LayerBackgroundMode.onlyColor; i++) {
         widget.editor.toggleBackgroundMode();
       }
     }
     // When disabling shadow, restore previous background mode
     else if (wasEnabled && !isEnabled && _savedBackgroundMode != null) {
-      while (widget.editor.backgroundColorMode != _savedBackgroundMode) {
+      for (int i = 0; i < 5 && widget.editor.backgroundColorMode != _savedBackgroundMode; i++) {
         widget.editor.toggleBackgroundMode();
       }
       _savedBackgroundMode = null;

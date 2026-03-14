@@ -98,6 +98,8 @@
   "editor_error_restore_history": "بازیابی تاریخچه ویرایش ممکن نیست",
   "editor_error_create_canvas": "ایجاد بوم ناموفق بود",
   "editor_error_no_image": "تصویری برای ذخیره وجود ندارد",
+  "editor_error_file_missing": "فایل تصویر یافت نشد",
+  "editor_error_image_too_large": "تصویر خیلی بزرگ است (حداکثر ۲۰ مگابایت)",
   
   "export_title": "ذخیره کار شما",
   "export_save_to_gallery": "ذخیره در گالری",

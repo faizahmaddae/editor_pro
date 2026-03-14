@@ -101,7 +101,6 @@ class TextEditorBottomPanel extends StatefulWidget {
 class _TextEditorBottomPanelState extends State<TextEditorBottomPanel> {
   int _tab = 0;
   int _prevTab = 0;
-  static const _tabCount = 4;
 
   // ── Auto-font state (lives here so it survives tab switches) ──
   bool _isAutoFont = true;
@@ -122,7 +121,7 @@ class _TextEditorBottomPanelState extends State<TextEditorBottomPanel> {
       ];
 
   void _switchTab(int i) {
-    if (i == _tab || i < 0 || i >= _tabCount) return;
+    if (i == _tab || i < 0 || i >= _labels.length) return;
     HapticFeedback.selectionClick();
     FocusManager.instance.primaryFocus?.unfocus();
     setState(() {

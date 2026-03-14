@@ -87,6 +87,24 @@ class GroundedTheme {
   static const Color overlayLightLight = Color(0x1A000000);
   static const Color overlayDarkLight = Color(0x40000000);
 
+  // ===== HOME SCREEN LIGHT-MODE TOKENS =====
+  // Refined cool-gray palette tuned for sRGB panels.
+
+  /// Home scaffold background (cool gray-100)
+  static const Color scaffoldLight = Color(0xFFF0F1F5);
+
+  /// Alternate card surface
+  static const Color cardAltLight = Color(0xFFF6F7FB);
+
+  /// Stronger border for card outlines
+  static const Color borderContrastLight = Color(0xFFD4D7E0);
+
+  /// High-contrast primary text (gray-900)
+  static const Color textHeroLight = Color(0xFF111827);
+
+  /// Drag handle / decorative element color
+  static const Color handleLight = Color(0xFFC0C4CC);
+
   // ===== ADAPTIVE COLORS (based on current theme mode) =====
   
   /// Primary background - adapts to theme mode
@@ -170,6 +188,21 @@ class GroundedTheme {
   
   /// Editor divider color
   static Color get editorDivider => isEditorDarkMode ? dividerDark : dividerLight;
+
+  // ===== EDITOR: ALWAYS-DARK GLASS TOKENS =====
+  // Used in glass buttons, pills, and overlays that are always rendered
+  // against the dark editor background regardless of the app theme.
+
+  /// Glass button fill (white ~12%)
+  static const Color glassButtonFill = Color(0x1FFFFFFF);
+  /// Glass button border (white ~18%)
+  static const Color glassButtonBorder = Color(0x2EFFFFFF);
+  /// Glass icon / text color (white ~90%)
+  static const Color glassIconColor = Color(0xE6FFFFFF);
+  /// Disabled icon / text color (white ~25%)
+  static const Color glassIconDisabled = Color(0x40FFFFFF);
+  /// Pill separator (white ~15%)
+  static const Color glassDivider = Color(0x26FFFFFF);
 
   // ===== SPACING =====
   

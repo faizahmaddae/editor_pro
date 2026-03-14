@@ -24,15 +24,15 @@ class HomeView extends StatefulWidget {
 }
 
 // ── Light-mode tokens ────────────────────────────────────
-// Tuned for real-device sRGB panels – no withOpacity.
-const _kScaffoldLight = Color(0xFFF0F1F5); // cool gray-100
-const _kCardLight = Color(0xFFFFFFFF);
-const _kCardAltLight = Color(0xFFF6F7FB); // alt surface
-const _kBorderLight = Color(0xFFD4D7E0); // gray-300
-const _kTextPrimaryLight = Color(0xFF111827); // gray-900
-const _kTextSecondaryLight = Color(0xFF6B7280); // gray-500
-const _kTextTertiaryLight = Color(0xFF9CA3AF); // gray-400
-const _kHandleLight = Color(0xFFC0C4CC);
+// Adaptive helpers mapping to GroundedTheme tokens.
+Color get _kScaffoldLight => GroundedTheme.scaffoldLight;
+Color get _kCardLight => GroundedTheme.cardLight;
+Color get _kCardAltLight => GroundedTheme.cardAltLight;
+Color get _kBorderLight => GroundedTheme.borderContrastLight;
+Color get _kTextPrimaryLight => GroundedTheme.textHeroLight;
+Color get _kTextSecondaryLight => GroundedTheme.textSecondaryLight;
+Color get _kTextTertiaryLight => GroundedTheme.textTertiaryLight;
+Color get _kHandleLight => GroundedTheme.handleLight;
 bool get _isLight => !GroundedTheme.isDarkMode;
 
 class _HomeViewState extends State<HomeView>
@@ -46,6 +46,9 @@ class _HomeViewState extends State<HomeView>
 
   // ── Shimmer animation ──────────────────────────────────
   late final AnimationController _shimmerController;
+
+  /// True once the stagger entrance animation has finished.
+  bool _staggerDone = false;
 
   @override
   void initState() {
@@ -64,12 +67,23 @@ class _HomeViewState extends State<HomeView>
         curve: Interval(start, end, curve: Curves.easeOutCubic),
       );
     });
-    _staggerController.forward();
+    _staggerController.forward().then((_) {
+      if (mounted) setState(() => _staggerDone = true);
+    });
 
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+    // Only run shimmer while loading is true to avoid wasted GPU frames.
+    ever(controller.isLoading, (bool loading) {
+      if (loading && !_shimmerController.isAnimating) {
+        _shimmerController.repeat();
+      } else if (!loading && _shimmerController.isAnimating) {
+        _shimmerController.stop();
+      }
+    });
+    if (controller.isLoading.value) _shimmerController.repeat();
   }
 
   @override
@@ -93,7 +107,7 @@ class _HomeViewState extends State<HomeView>
   @override
   void didPopNext() {
     if (kDebugMode) debugPrint('>>> HomeView: didPopNext - Refreshing');
-    controller.loadRecentProjects();
+    controller.loadRecentProjects(invalidateCache: true);
     // Restore status bar style after returning from editor (which forces light icons)
     _applyStatusBarStyle();
   }
@@ -118,7 +132,10 @@ class _HomeViewState extends State<HomeView>
   // ── Helpers ────────────────────────────────────────────
 
   /// Wraps a section widget with staggered fade + slide entrance.
+  /// After the stagger animation completes, returns [child] directly
+  /// to avoid unnecessary FadeTransition / SlideTransition rebuilds.
   Widget _animated(int index, Widget child) {
+    if (_staggerDone) return child;
     return FadeTransition(
       opacity: _sectionAnims[index],
       child: SlideTransition(

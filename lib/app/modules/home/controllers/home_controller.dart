@@ -30,12 +30,14 @@ class HomeController extends GetxController {
   }
 
   /// Load recent projects from storage
-  Future<void> loadRecentProjects() async {
-    // Clear the entire image cache (including ResizeImage wrappers created
-    // by cacheWidth in Image.file). Per-key eviction with FileImage misses
-    // the ResizeImage entries, causing stale thumbnails after re-editing.
-    imageCache.clear();
-    imageCache.clearLiveImages();
+  Future<void> loadRecentProjects({bool invalidateCache = false}) async {
+    if (invalidateCache) {
+      // Clear the entire image cache (including ResizeImage wrappers created
+      // by cacheWidth in Image.file). Per-key eviction with FileImage misses
+      // the ResizeImage entries, causing stale thumbnails after re-editing.
+      imageCache.clear();
+      imageCache.clearLiveImages();
+    }
     
     final projects = _storage.getRecentProjects();
     if (kDebugMode) {
@@ -49,9 +51,6 @@ class HomeController extends GetxController {
     recentProjects.addAll(projects);
     recentProjects.refresh(); // Force UI to rebuild
     if (kDebugMode) debugPrint('>>> HomeController: recentProjects refreshed, count: ${recentProjects.length}');
-
-    // Give the RefreshIndicator time to show the spinner visibly
-    await Future.delayed(const Duration(milliseconds: 300));
   }
 
   /// Pick image from gallery
@@ -72,6 +71,7 @@ class HomeController extends GetxController {
 
   /// Internal pick image handler
   Future<void> _pickImage(ImageSource source) async {
+    if (isLoading.value) return;
     try {
       isLoading.value = true;
       errorMessage.value = '';
@@ -127,10 +127,12 @@ class HomeController extends GetxController {
         'projectId': project.id,
       };
       
-      // If project has editable history, pass it along
+      // If project has editable history, pass it along.
       if (project.hasEditableHistory) {
         args['stateHistoryPath'] = project.stateHistoryPath;
-        args['originalImagePath'] = project.originalImagePath;
+        if (project.originalImagePath != null) {
+          args['originalImagePath'] = project.originalImagePath;
+        }
         if (kDebugMode) {
           debugPrint('>>> Opening project with editable history');
           debugPrint('>>>   stateHistoryPath: ${project.stateHistoryPath}');
@@ -140,7 +142,8 @@ class HomeController extends GetxController {
       
       // Precache the image before navigating for smoother editor opening
       try {
-        final imageToCache = project.hasEditableHistory && project.originalImagePath != null
+        final imageToCache = project.originalImagePath != null &&
+                File(project.originalImagePath!).existsSync()
             ? project.originalImagePath!
             : project.imagePath;
         await precacheImage(

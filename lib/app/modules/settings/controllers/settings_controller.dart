@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -10,6 +12,16 @@ import '../../../core/theme/grounded_theme.dart';
 
 class SettingsController extends GetxController {
   final _storage = GetStorage();
+  final Map<String, Timer> _writeTimers = {};
+
+  /// Debounced write — coalesces rapid toggles into a single disk write.
+  void _debouncedWrite<T>(String key, T value, {Duration delay = const Duration(milliseconds: 300)}) {
+    _writeTimers[key]?.cancel();
+    _writeTimers[key] = Timer(delay, () {
+      _storage.write(key, value);
+      _writeTimers.remove(key);
+    });
+  }
   
   // Keys for storage
   static const String _languageKey = 'language';
@@ -186,47 +198,47 @@ class SettingsController extends GetxController {
 
   void setExportQuality(int quality) {
     exportQuality.value = quality;
-    _storage.write(_exportQualityKey, quality);
+    _debouncedWrite(_exportQualityKey, quality);
   }
 
   void toggleSaveToGallery(bool value) {
     saveToGallery.value = value;
-    _storage.write(_saveToGalleryKey, value);
+    _debouncedWrite(_saveToGalleryKey, value);
   }
 
   void toggleShowGrid(bool value) {
     showGrid.value = value;
-    _storage.write(_showGridKey, value);
+    _debouncedWrite(_showGridKey, value);
   }
 
   void toggleEditorDarkMode(bool value) {
     isEditorDarkMode.value = value;
-    _storage.write(_editorDarkModeKey, value);
+    _debouncedWrite(_editorDarkModeKey, value);
   }
 
   void toggleZoom(bool value) {
     enableZoom.value = value;
-    _storage.write(_enableZoomKey, value);
+    _debouncedWrite(_enableZoomKey, value);
   }
   
   void setOutputFormat(String format) {
     outputFormat.value = format;
-    _storage.write(_outputFormatKey, format);
+    _debouncedWrite(_outputFormatKey, format);
   }
   
   void setMaxOutputSize(int size) {
     maxOutputSize.value = size;
-    _storage.write(_maxOutputSizeKey, size);
+    _debouncedWrite(_maxOutputSizeKey, size);
   }
   
   void toggleBackgroundGeneration(bool value) {
     enableBackgroundGeneration.value = value;
-    _storage.write(_backgroundGenerationKey, value);
+    _debouncedWrite(_backgroundGenerationKey, value);
   }
   
   void toggleIsolateGeneration(bool value) {
     enableIsolateGeneration.value = value;
-    _storage.write(_isolateGenerationKey, value);
+    _debouncedWrite(_isolateGenerationKey, value);
   }
 
   /// Reset all settings to factory defaults

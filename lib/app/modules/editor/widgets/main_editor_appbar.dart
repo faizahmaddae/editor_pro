@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 
 import '../../../../generated/locales.g.dart';
+import '../../../core/theme/grounded_theme.dart';
 import '../../../core/widgets/glass_icon_button.dart';
+import '../../../core/widgets/undo_redo_pill.dart';
 
 /// Premium editor app bar with refined aesthetics
 /// Inspired by Lightroom, VSCO, and professional photo editors
@@ -39,11 +41,11 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
     final topPadding = MediaQuery.paddingOf(context).top;
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF000000),
+      decoration: BoxDecoration(
+        color: GroundedTheme.backgroundDark,
         border: Border(
           bottom: BorderSide(
-            color: Color(0xFF1A1A1A),
+            color: GroundedTheme.surfaceElevatedDark,
             width: 0.5,
           ),
         ),
@@ -52,7 +54,10 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
       child: SizedBox(
         height: barHeight,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: GroundedTheme.spacing8,
+            vertical: GroundedTheme.spacing4,
+          ),
           child: Row(
             children: [
               // Close button - minimal circle
@@ -68,7 +73,7 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
               const Spacer(),
 
               // Undo/Redo in a connected pill — centered
-              _UndoRedoPill(
+              UndoRedoPill(
                 canUndo: canUndo,
                 canRedo: canRedo,
                 onUndo: () {
@@ -99,110 +104,4 @@ class MainEditorAppBarCustom extends StatelessWidget implements PreferredSizeWid
     );
   }
 }
-
-/// Connected undo/redo pill with premium styling
-class _UndoRedoPill extends StatelessWidget {
-  const _UndoRedoPill({
-    required this.canUndo,
-    required this.canRedo,
-    required this.onUndo,
-    required this.onRedo,
-  });
-
-  final bool canUndo;
-  final bool canRedo;
-  final VoidCallback onUndo;
-  final VoidCallback onRedo;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.12),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Undo
-          _PillButton(
-            onTap: canUndo ? onUndo : null,
-            icon: Icons.undo_rounded,
-            enabled: canUndo,
-            isStart: true,
-            tooltip: LocaleKeys.common_undo.tr,
-          ),
-          // Subtle divider
-          Container(
-            width: 1,
-            height: 24,
-            color: Colors.white.withValues(alpha: 0.15),
-          ),
-          // Redo
-          _PillButton(
-            onTap: canRedo ? onRedo : null,
-            icon: Icons.redo_rounded,
-            enabled: canRedo,
-            isStart: false,
-            tooltip: LocaleKeys.common_redo.tr,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Individual button within the undo/redo pill
-class _PillButton extends StatelessWidget {
-  const _PillButton({
-    required this.onTap,
-    required this.icon,
-    required this.enabled,
-    required this.isStart,
-    this.tooltip,
-  });
-
-  final VoidCallback? onTap;
-  final IconData icon;
-  final bool enabled;
-  final bool isStart;
-  final String? tooltip;
-
-  @override
-  Widget build(BuildContext context) {
-    final borderRadius = BorderRadiusDirectional.horizontal(
-      start: isStart ? const Radius.circular(22) : Radius.zero,
-      end: !isStart ? const Radius.circular(22) : Radius.zero,
-    ).resolve(Directionality.of(context));
-
-    return Tooltip(
-      message: tooltip ?? '',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: enabled ? onTap : null,
-          borderRadius: borderRadius,
-          child: Container(
-            width: 48,
-            height: 44,
-            alignment: Alignment.center,
-            child: Icon(
-              icon,
-              color: enabled 
-                  ? Colors.white.withValues(alpha: 0.9) 
-                  : Colors.white.withValues(alpha: 0.25),
-              size: 20,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 

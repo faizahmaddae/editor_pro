@@ -98,6 +98,8 @@
   "editor_error_restore_history": "Could not restore edit history",
   "editor_error_create_canvas": "Failed to create canvas",
   "editor_error_no_image": "No image to save",
+  "editor_error_file_missing": "Image file not found",
+  "editor_error_image_too_large": "Image is too large (max 20 MB)",
   
   "export_title": "Save Your Work",
   "export_save_to_gallery": "Save to Gallery",

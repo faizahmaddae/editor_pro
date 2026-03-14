@@ -40,15 +40,22 @@ class Project {
     'lastEditedAt': lastEditedAt.toIso8601String(),
   };
 
-  factory Project.fromJson(Map<String, dynamic> json) => Project(
-    id: json['id'] as String,
-    imagePath: json['imagePath'] as String,
-    thumbnailPath: json['thumbnailPath'] as String?,
-    stateHistoryPath: json['stateHistoryPath'] as String?,
-    originalImagePath: json['originalImagePath'] as String?,
-    createdAt: DateTime.parse(json['createdAt'] as String),
-    lastEditedAt: DateTime.parse(json['lastEditedAt'] as String),
-  );
+  factory Project.fromJson(Map<String, dynamic> json) {
+    // Schema migration: handle missing/malformed fields from older versions
+    return Project(
+      id: json['id'] as String? ?? '',
+      imagePath: json['imagePath'] as String? ?? '',
+      thumbnailPath: json['thumbnailPath'] as String?,
+      stateHistoryPath: json['stateHistoryPath'] as String?,
+      originalImagePath: json['originalImagePath'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
+          : DateTime.now(),
+      lastEditedAt: json['lastEditedAt'] != null
+          ? DateTime.tryParse(json['lastEditedAt'] as String) ?? DateTime.now()
+          : DateTime.now(),
+    );
+  }
 
   Project copyWith({
     String? id,

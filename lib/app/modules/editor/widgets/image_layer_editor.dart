@@ -841,7 +841,8 @@ class _ImageLayerEditorState extends State<ImageLayerEditor>
     try {
       final pickedFile = await _imagePicker.pickImage(
         source: source,
-        // No imageQuality compression — preserve full resolution
+        maxWidth: 4096,
+        maxHeight: 4096,
       );
 
       if (pickedFile != null && mounted) {

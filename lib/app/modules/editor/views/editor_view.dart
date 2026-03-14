@@ -12,6 +12,7 @@ import '../../../core/enums/editing_session_state.dart';
 import '../../../core/formats/format_presets.dart';
 import '../../../core/theme/grounded_theme.dart';
 import '../../../modules/settings/controllers/settings_controller.dart';
+import '../../../../generated/locales.g.dart';
 import '../configs/editor_style_configs.dart';
 import '../controllers/editor_controller.dart';
 import '../widgets/premium_color_picker.dart';
@@ -130,6 +131,12 @@ class _EditorContentState extends State<_EditorContent> {
 
       return LayoutBuilder(
         builder: (context, constraints) {
+          // Guard: verify image file exists before handing it to the editor.
+          final imageFile = File(widget.controller.editorImagePath);
+          if (!imageFile.existsSync()) {
+            return _buildError(LocaleKeys.editor_error_file_missing.tr);
+          }
+
           // Reuse cached configs when constraints haven't changed.
           if (_cachedConfigs == null ||
               constraints.maxWidth != _cachedConstraintsWidth ||
@@ -143,7 +150,7 @@ class _EditorContentState extends State<_EditorContent> {
           // Always use file mode - blank canvas is now a generated image file
           return ProImageEditor.file(
             // Use editorImagePath which returns original image when reopening
-            File(widget.controller.editorImagePath),
+            imageFile,
             key: _editorKey,
             callbacks: _cachedCallbacks!,
             configs: _cachedConfigs!,
@@ -454,6 +461,33 @@ class _EditorContentState extends State<_EditorContent> {
   // ═══════════════════════════════════════════════════════════════════════════
   // HELPER METHODS
   // ═══════════════════════════════════════════════════════════════════════════
+
+  /// Fallback screen shown when the source image cannot be loaded.
+  Widget _buildError(String message) {
+    return Container(
+      color: GroundedTheme.backgroundDark,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.broken_image_rounded, color: GroundedTheme.error, size: 48),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: const TextStyle(color: Colors.white70, fontSize: 15),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(LocaleKeys.common_back.tr,
+                  style: const TextStyle(color: GroundedTheme.primary)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   /// Opens the layer reorder bottom sheet
   void _openReorderSheet(ProImageEditorState editor) {

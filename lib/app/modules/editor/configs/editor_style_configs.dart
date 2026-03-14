@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
 import 'package:pro_image_editor/designs/grounded/grounded_design.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
@@ -13,6 +12,7 @@ import '../widgets/draft_exit_sheet.dart';
 import '../widgets/editor_loading_overlay.dart';
 import '../widgets/main_editor_appbar.dart';
 import '../widgets/main_editor_bottombar.dart';
+import '../widgets/premium_color_picker.dart';
 import '../widgets/sub_editor_appbar.dart';
 import '../widgets/text_editor_appbar.dart';
 import '../widgets/text_editor_bottom_panel/fonts_tab.dart';
@@ -402,32 +402,17 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
-                showActionBar: false,
                 i18nColor: LocaleKeys.paint_color.tr,
                 showColorPicker: (currentColor) {
-                  Color? newColor;
-                  showDialog(
+                  showModalBottomSheet(
                     context: context,
-                    builder: (context) => AlertDialog(
-                      content: SingleChildScrollView(
-                        child: ColorPicker(
-                          pickerColor: currentColor,
-                          onColorChanged: (color) {
-                            newColor = color;
-                          },
-                        ),
-                      ),
-                      actions: <Widget>[
-                        ElevatedButton(
-                          child: Text(LocaleKeys.paint_done.tr),
-                          onPressed: () {
-                            if (newColor != null) {
-                              editorState.setColor(newColor!);
-                            }
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
+                    backgroundColor: Colors.transparent,
+                    isScrollControlled: true,
+                    builder: (_) => PremiumColorPicker(
+                      currentColor: currentColor,
+                      onColorChanged: (color) {
+                        editorState.setColor(color);
+                      },
                     ),
                   );
                 },
@@ -652,7 +637,6 @@ class EditorStyleConfigs {
             callbacks: cropRotateEditor.callbacks,
             editor: cropRotateEditor,
             selectedRatioColor: GroundedTheme.primary,
-            showActionBar: false,
           ),
         ),
       ),
@@ -698,7 +682,6 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
-                showActionBar: false,
               );
             },
             stream: rebuildStream,
@@ -738,7 +721,6 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
-                showActionBar: false,
               );
             },
             stream: rebuildStream,
@@ -773,7 +755,6 @@ class EditorStyleConfigs {
                 configs: editorState.configs,
                 callbacks: editorState.callbacks,
                 editor: editorState,
-                showActionBar: false,
               );
             },
             stream: rebuildStream,

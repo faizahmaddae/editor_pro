@@ -147,6 +147,8 @@ class _CustomStickerEditorState extends State<CustomStickerEditor>
     try {
       final pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
+        maxWidth: 2048,
+        maxHeight: 2048,
       );
 
       if (pickedFile != null && mounted) {
@@ -251,8 +253,8 @@ class _CustomStickerEditorState extends State<CustomStickerEditor>
       builder: (context) => StatefulBuilder(
         builder: (context, setSheetState) => Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            color: GroundedTheme.surfaceElevatedDark,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(GroundedTheme.radiusXLarge)),
           ),
           padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
           child: SafeArea(

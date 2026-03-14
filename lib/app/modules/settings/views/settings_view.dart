@@ -26,7 +26,7 @@ class SettingsView extends GetView<SettingsController> {
         ),
         elevation: 0,
       ),
-      body: Obx(() => ListView(
+      body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 20),
         children: [
           // === Appearance Section ===
@@ -41,7 +41,7 @@ class SettingsView extends GetView<SettingsController> {
 
           // === Export Section ===
           _SectionHeader(LocaleKeys.settings_export.tr),
-          _CardGroup(children: [
+          Obx(() => _CardGroup(children: [
             _buildOutputFormatTile(),
             const _GroupDivider(),
             _buildExportQualityTile(),
@@ -55,13 +55,13 @@ class SettingsView extends GetView<SettingsController> {
               onChanged: controller.toggleSaveToGallery,
               icon: Icons.photo_library_outlined,
             ),
-          ]),
+          ])),
 
           const SizedBox(height: 28),
 
           // === Performance Section ===
           _SectionHeader(LocaleKeys.settings_performance.tr),
-          _CardGroup(children: [
+          Obx(() => _CardGroup(children: [
             _buildSwitchTile(
               title: LocaleKeys.settings_background_gen.tr,
               subtitle: LocaleKeys.settings_background_gen_desc.tr,
@@ -77,13 +77,13 @@ class SettingsView extends GetView<SettingsController> {
               onChanged: controller.toggleIsolateGeneration,
               icon: Icons.memory_outlined,
             ),
-          ]),
+          ])),
 
           const SizedBox(height: 28),
 
           // === Editor Section ===
           _SectionHeader(LocaleKeys.settings_editor.tr),
-          _CardGroup(children: [
+          Obx(() => _CardGroup(children: [
             _buildSwitchTile(
               title: LocaleKeys.settings_show_grid.tr,
               subtitle: LocaleKeys.settings_show_grid_desc.tr,
@@ -99,7 +99,7 @@ class SettingsView extends GetView<SettingsController> {
               onChanged: controller.toggleZoom,
               icon: Icons.zoom_in_outlined,
             ),
-          ]),
+          ])),
 
           const SizedBox(height: 28),
 
@@ -130,14 +130,14 @@ class SettingsView extends GetView<SettingsController> {
 
           const SizedBox(height: 32),
         ],
-      )),
+      ),
     );
   }
 
   // ===== Individual tile builders =====
 
   Widget _buildThemeModeTile() {
-    return SwitchListTile(
+    return Obx(() => SwitchListTile(
       secondary: _IconBox(
         icon: controller.isDarkMode.value
             ? Icons.dark_mode_outlined
@@ -165,11 +165,11 @@ class SettingsView extends GetView<SettingsController> {
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onChanged: controller.toggleThemeMode,
-    );
+    ));
   }
 
   Widget _buildLanguageTile() {
-    return ListTile(
+    return Obx(() => ListTile(
       leading: const _IconBox(icon: Icons.language),
       title: Text(
         LocaleKeys.settings_language.tr,
@@ -186,7 +186,7 @@ class SettingsView extends GetView<SettingsController> {
       trailing: const _DirectionalChevron(),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: () => _showLanguageDialog(),
-    );
+    ));
   }
 
   Widget _buildOutputFormatTile() {

@@ -7,6 +7,7 @@ import 'package:pro_image_editor/core/mixins/converted_configs.dart';
 import 'package:pro_image_editor/core/mixins/editor_configs_mixin.dart';
 
 import '../../../../generated/locales.g.dart';
+import '../../../core/theme/grounded_theme.dart';
 import 'custom_sticker_editor.dart';
 import 'image_layer_editor.dart';
 
@@ -37,6 +38,15 @@ class MainEditorBottomBarCustom extends StatefulWidget with SimpleConfigsAccess 
 
 class _MainEditorBottomBarCustomState extends State<MainEditorBottomBarCustom>
     with ImageEditorConvertedConfigs, SimpleConfigsAccessState {
+
+  /// Cached tool widgets — rebuilt only once since tools don't change mid-session.
+  late final List<Widget> _cachedToolList;
+
+  @override
+  void initState() {
+    super.initState();
+    _cachedToolList = _buildToolList();
+  }
 
   void _openEmojiEditor() async {
     HapticFeedback.selectionClick();
@@ -71,23 +81,26 @@ class _MainEditorBottomBarCustomState extends State<MainEditorBottomBarCustom>
     return Offstage(
       offstage: isHidden,
       child: Container(
-        color: const Color(0xFF000000),
+        color: GroundedTheme.backgroundDark,
         child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Tools row
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: GroundedTheme.spacing12),
               child: SingleChildScrollView(
                 key: const PageStorageKey<String>('editor_toolbar_scroll'),
                 controller: widget.toolbarScrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
                 child: Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 8, end: 8),
+                  padding: const EdgeInsetsDirectional.only(
+                    start: GroundedTheme.spacing8,
+                    end: GroundedTheme.spacing8,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: _buildToolList()
+                    children: _cachedToolList
                         .asMap()
                         .entries
                         .map((entry) => Padding(
@@ -208,16 +221,19 @@ class _ToolItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      button: true,
-      child: GestureDetector(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        behavior: HitTestBehavior.opaque,
-        child: SizedBox(
+    return Tooltip(
+      message: label,
+      child: Semantics(
+        label: label,
+        button: true,
+        enabled: true,
+        child: GestureDetector(
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
+          behavior: HitTestBehavior.opaque,
+          child: SizedBox(
           width: 64,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -227,19 +243,19 @@ class _ToolItem extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0x1AFFFFFF), // 10% white
+                  color: GroundedTheme.overlayLightDark,
                   border: Border.all(
-                    color: const Color(0x1AFFFFFF),
+                    color: GroundedTheme.overlayLightDark,
                     width: 1,
                   ),
                 ),
                 child: Icon(
                   icon,
-                  color: Colors.white,
+                  color: GroundedTheme.textPrimaryDark,
                   size: 24,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: GroundedTheme.spacing8),
               Text(
                 label,
                 style: const TextStyle(
@@ -254,6 +270,7 @@ class _ToolItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

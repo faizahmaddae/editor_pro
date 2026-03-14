@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../generated/locales.g.dart';
+import '../../../core/theme/grounded_theme.dart';
 import '../../../data/services/export_service.dart';
 
 /// Creative export page - Celebrate the user's creation!
@@ -17,6 +18,7 @@ class ExportPage extends StatefulWidget {
 
 class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   late final Uint8List imageBytes;
+  late final MemoryImage _imageProvider;
   late final VoidCallback? onSaveComplete;
   late final Future<void> Function()? onSaveToRecentProjects;
 
@@ -38,6 +40,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     super.initState();
     final args = Get.arguments as Map<String, dynamic>;
     imageBytes = args['imageBytes'] as Uint8List;
+    _imageProvider = MemoryImage(imageBytes);
     onSaveComplete = args['onSaveComplete'] as VoidCallback?;
     onSaveToRecentProjects = args['onSaveToRecentProjects'] as Future<void> Function()?;
 
@@ -81,7 +84,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   Future<void> _saveToGallery() async {
     if (_state == ExportState.saving) return;
 
-    setState(() => _state = ExportState.saving);
+    _setExportState(ExportState.saving);
     HapticFeedback.lightImpact();
 
     try {
@@ -89,10 +92,8 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
 
       if (success) {
         await onSaveToRecentProjects?.call();
-        setState(() {
-          _state = ExportState.success;
-          _successType = _SuccessType.gallery;
-        });
+        _successType = _SuccessType.gallery;
+        _setExportState(ExportState.success);
         _scaleController.forward();
         HapticFeedback.mediumImpact();
 
@@ -100,17 +101,13 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
         onSaveComplete?.call();
         Get.back(result: true);
       } else {
-        setState(() {
-          _state = ExportState.error;
-          _errorMessage = LocaleKeys.editor_save_failed.tr;
-        });
+        _errorMessage = LocaleKeys.editor_save_failed.tr;
+        _setExportState(ExportState.error);
         HapticFeedback.heavyImpact();
       }
     } catch (e) {
-      setState(() {
-        _state = ExportState.error;
-        _errorMessage = e.toString();
-      });
+      _errorMessage = e.toString();
+      _setExportState(ExportState.error);
       HapticFeedback.heavyImpact();
     }
   }
@@ -118,7 +115,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   Future<void> _shareImage() async {
     if (_state == ExportState.saving) return;
 
-    setState(() => _state = ExportState.saving);
+    _setExportState(ExportState.saving);
     HapticFeedback.lightImpact();
 
     try {
@@ -127,7 +124,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       if (success) {
         await onSaveToRecentProjects?.call();
         onSaveComplete?.call();
-        setState(() => _state = ExportState.idle);
+        _setExportState(ExportState.idle);
         
         Get.snackbar(
           '',
@@ -141,34 +138,30 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           ),
           messageText: const SizedBox.shrink(),
           snackPosition: SnackPosition.TOP,
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: GroundedTheme.success,
           duration: const Duration(seconds: 2),
           margin: const EdgeInsets.all(16),
           borderRadius: 12,
         );
       } else {
-        setState(() => _state = ExportState.idle);
+        _setExportState(ExportState.idle);
       }
     } catch (e) {
-      setState(() {
-        _state = ExportState.error;
-        _errorMessage = e.toString();
-      });
+      _errorMessage = e.toString();
+      _setExportState(ExportState.error);
     }
   }
 
   Future<void> _saveDraft() async {
     if (_state == ExportState.saving) return;
 
-    setState(() => _state = ExportState.saving);
+    _setExportState(ExportState.saving);
     HapticFeedback.lightImpact();
 
     try {
       await onSaveToRecentProjects?.call();
-      setState(() {
-        _state = ExportState.success;
-        _successType = _SuccessType.draft;
-      });
+      _successType = _SuccessType.draft;
+      _setExportState(ExportState.success);
       _scaleController.forward();
       HapticFeedback.mediumImpact();
 
@@ -176,10 +169,8 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       onSaveComplete?.call();
       Get.back(result: true);
     } catch (e) {
-      setState(() {
-        _state = ExportState.error;
-        _errorMessage = e.toString();
-      });
+      _errorMessage = e.toString();
+      _setExportState(ExportState.error);
       HapticFeedback.heavyImpact();
     }
   }
@@ -191,8 +182,20 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     Get.back();
   }
 
+  void _setExportState(ExportState state) {
+    setState(() => _state = state);
+    if (state == ExportState.success || state == ExportState.error) {
+      _floatController.stop();
+    } else if (state == ExportState.idle && !_floatController.isAnimating) {
+      _floatController.repeat(reverse: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final bottomPadding = MediaQuery.paddingOf(context).bottom;
+
     return PopScope(
       canPop: _state != ExportState.saving,
       child: Scaffold(
@@ -211,8 +214,8 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
                   children: [
                     _buildTopBar(),
                     const SizedBox(height: 8),
-                    Expanded(child: _buildHeroImage()),
-                    _buildBottomSection(),
+                    Expanded(child: _buildHeroImage(screenSize)),
+                    _buildBottomSection(bottomPadding),
                   ],
                 ),
               ),
@@ -275,7 +278,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildHeroImage() {
+  Widget _buildHeroImage(Size screenSize) {
     return AnimatedBuilder(
       animation: _floatAnimation,
       builder: (context, child) {
@@ -293,22 +296,19 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
               // Glow effect behind image
               Container(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.50,
-                  maxWidth: MediaQuery.of(context).size.width * 0.92,
+                  maxHeight: screenSize.height * 0.50,
+                  maxWidth: screenSize.width * 0.92,
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
                   child: ImageFiltered(
                     imageFilter: const ColorFilter.mode(
-                      Color(0xFF2196F3),
+                      GroundedTheme.primary,
                       BlendMode.srcATop,
                     ),
                     child: Opacity(
                       opacity: 0.3,
-                      child: Image.memory(
-                        imageBytes,
-                        fit: BoxFit.contain,
-                      ),
+                      child: Image(image: _imageProvider, fit: BoxFit.contain),
                     ),
                   ),
                 ),
@@ -316,35 +316,32 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
               // Main image
               Container(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.50,
-                  maxWidth: MediaQuery.of(context).size.width * 0.92,
+                  maxHeight: screenSize.height * 0.50,
+                  maxWidth: screenSize.width * 0.92,
                 ),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF2196F3).withValues(alpha: 0.2),
+                      color: GroundedTheme.primary.withValues(alpha: 0.2),
                       blurRadius: 40,
                       spreadRadius: 0,
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.memory(
-                    imageBytes,
-                    fit: BoxFit.contain,
-                  ),
+                  borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
+                  child: Image(image: _imageProvider, fit: BoxFit.contain),
                 ),
               ),
               // Loading overlay on image
               if (_state == ExportState.saving)
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
                   child: Container(
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height * 0.50,
-                      maxWidth: MediaQuery.of(context).size.width * 0.92,
+                      maxHeight: screenSize.height * 0.50,
+                      maxWidth: screenSize.width * 0.92,
                     ),
                     color: Colors.black54,
                     child: const Center(
@@ -359,13 +356,13 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildBottomSection() {
+  Widget _buildBottomSection(double bottomPadding) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        20,
-        16,
-        20,
-        MediaQuery.of(context).padding.bottom + 12,
+        GroundedTheme.spacing20,
+        GroundedTheme.spacing16,
+        GroundedTheme.spacing20,
+        bottomPadding + GroundedTheme.spacing12,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -386,7 +383,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
       height: 60,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.05),
         ),
@@ -399,7 +396,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
             color: Colors.white.withValues(alpha: 0.15),
             size: 16,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: GroundedTheme.spacing8),
           Text(
             LocaleKeys.export_sponsored.tr,
             style: TextStyle(
@@ -465,8 +462,8 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
   Widget _buildSuccessContent() {
     final bool isDraft = _successType == _SuccessType.draft;
     final Color primaryColor = isDraft 
-        ? const Color(0xFF7C4DFF)  // Purple for draft
-        : const Color(0xFF4CAF50); // Green for gallery
+        ? GroundedTheme.secondary  // Purple for draft
+        : GroundedTheme.success; // Green for gallery
     final Color secondaryColor = isDraft 
         ? const Color(0xFF5E35B1) 
         : const Color(0xFF2E7D32);
@@ -537,12 +534,12 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
           height: 80,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.red.withValues(alpha: 0.15),
-            border: Border.all(color: Colors.red.withValues(alpha: 0.5), width: 2),
+            color: GroundedTheme.error.withValues(alpha: 0.15),
+            border: Border.all(color: GroundedTheme.error.withValues(alpha: 0.5), width: 2),
           ),
           child: const Icon(
             Icons.error_outline_rounded,
-            color: Colors.red,
+            color: GroundedTheme.error,
             size: 40,
           ),
         ),
@@ -568,7 +565,7 @@ class _ExportPageState extends State<ExportPage> with TickerProviderStateMixin {
         ],
         const SizedBox(height: 24),
         TextButton(
-          onPressed: () => setState(() => _state = ExportState.idle),
+          onPressed: () => _setExportState(ExportState.idle),
           style: TextButton.styleFrom(
             backgroundColor: Colors.white.withValues(alpha: 0.1),
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
@@ -599,18 +596,22 @@ class _GlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
+        child: Ink(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
           ),
+          child: child,
         ),
-        child: child,
       ),
     );
   }
@@ -634,21 +635,21 @@ class _PrimaryActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
         child: Ink(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Color(0xFF42A5F5),
+                GroundedTheme.primary,
                 Color(0xFF1976D2),
               ],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(GroundedTheme.radiusLarge),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+                color: GroundedTheme.primary.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -697,12 +698,12 @@ class _SecondaryActionButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.15),
             ),

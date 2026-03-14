@@ -107,6 +107,8 @@ class LocaleKeys {
   static const editor_error_restore_history = 'editor_error_restore_history';
   static const editor_error_create_canvas = 'editor_error_create_canvas';
   static const editor_error_no_image = 'editor_error_no_image';
+  static const editor_error_file_missing = 'editor_error_file_missing';
+  static const editor_error_image_too_large = 'editor_error_image_too_large';
   static const export_title = 'export_title';
   static const export_save_to_gallery = 'export_save_to_gallery';
   static const export_share = 'export_share';
@@ -553,6 +555,8 @@ class Locales {
     'editor_error_restore_history': 'Could not restore edit history',
     'editor_error_create_canvas': 'Failed to create canvas',
     'editor_error_no_image': 'No image to save',
+    'editor_error_file_missing': 'Image file not found',
+    'editor_error_image_too_large': 'Image is too large (max 20 MB)',
     'export_title': 'Save Your Work',
     'export_save_to_gallery': 'Save to Gallery',
     'export_share': 'Share',
@@ -993,6 +997,8 @@ class Locales {
     'editor_error_restore_history': 'بازیابی تاریخچه ویرایش ممکن نیست',
     'editor_error_create_canvas': 'ایجاد بوم ناموفق بود',
     'editor_error_no_image': 'تصویری برای ذخیره وجود ندارد',
+    'editor_error_file_missing': 'فایل تصویر یافت نشد',
+    'editor_error_image_too_large': 'تصویر خیلی بزرگ است (حداکثر ۲۰ مگابایت)',
     'export_title': 'ذخیره کار شما',
     'export_save_to_gallery': 'ذخیره در گالری',
     'export_share': 'اشتراک‌گذاری',

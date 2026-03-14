@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,6 +14,18 @@ import 'generated/locales.g.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Global error handler — logs uncaught Flutter framework errors
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    debugPrint('[FlutterError] ${details.exceptionAsString()}');
+  };
+
+  // Catch async errors not handled by Flutter framework
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('[PlatformError] $error\n$stack');
+    return true;
+  };
   
   // Initialize GetStorage (default container)
   await GetStorage.init();
@@ -54,6 +67,7 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   
+  // Wrap runApp to catch errors in the widget tree
   runApp(PhotoEditorApp(initialLocale: initialLocale));
 }
 

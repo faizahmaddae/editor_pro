@@ -60,8 +60,8 @@ class _FontPickerSheetState extends State<FontPickerSheet>
     return Container(
       height: screenHeight * 0.7,
       decoration: const BoxDecoration(
-        color: Color(0xFF161616),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        color: GroundedTheme.surfaceDark,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(GroundedTheme.radiusLarge)),
       ),
       child: Column(
         children: [

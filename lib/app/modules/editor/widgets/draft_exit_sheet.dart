@@ -91,7 +91,7 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
           LocaleKeys.common_error.tr,
           LocaleKeys.export_failed.tr,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xCCE53935),
+          backgroundColor: GroundedTheme.error.withValues(alpha: 0.8),
           colorText: Colors.white,
         );
         return;
@@ -110,7 +110,7 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
           LocaleKeys.common_error.tr,
           LocaleKeys.export_failed.tr,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: const Color(0xCCE53935),
+          backgroundColor: GroundedTheme.error.withValues(alpha: 0.8),
           colorText: Colors.white,
         );
         return;
@@ -125,7 +125,7 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
         LocaleKeys.common_error.tr,
         LocaleKeys.export_failed.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xCCE53935),
+        backgroundColor: GroundedTheme.error.withValues(alpha: 0.8),
         colorText: Colors.white,
       );
     }
@@ -146,9 +146,12 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
       child: Container(
         decoration: const BoxDecoration(
           color: GroundedTheme.surfaceElevatedDark,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(GroundedTheme.radiusXLarge)),
         ),
-        padding: EdgeInsetsDirectional.fromSTEB(20, 8, 20, bottomPadding + 12),
+        padding: EdgeInsetsDirectional.fromSTEB(
+          GroundedTheme.spacing20, GroundedTheme.spacing8,
+          GroundedTheme.spacing20, bottomPadding + GroundedTheme.spacing12,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -161,28 +164,28 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: GroundedTheme.spacing16),
 
             // Title
             Text(
               LocaleKeys.draft_title.tr,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: Color(0xF0FFFFFF),
+                color: GroundedTheme.textPrimaryDark.withValues(alpha: 0.94),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: GroundedTheme.spacing4),
 
             // Subtitle
             Text(
               LocaleKeys.draft_subtitle.tr,
               style: const TextStyle(
-                fontSize: 13,
-                color: Colors.white54,
+                fontSize: GroundedTheme.fontSizeS,
+                color: GroundedTheme.textSecondaryDark,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: GroundedTheme.spacing20),
 
             // Primary: Save Draft
             _SheetButton(
@@ -190,21 +193,21 @@ class _DraftExitSheetState extends State<DraftExitSheet> {
                   ? LocaleKeys.editor_saving.tr
                   : LocaleKeys.draft_save.tr,
               icon: _isSaving ? null : Icons.save_rounded,
-              backgroundColor: const Color(0xFF43A047),
+              backgroundColor: GroundedTheme.success,
               onTap: _isSaving ? null : _handleSaveDraft,
               isLoading: _isSaving,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: GroundedTheme.spacing8),
 
             // Secondary: Discard Changes
             _SheetButton(
               label: LocaleKeys.draft_discard.tr,
               icon: Icons.delete_outline_rounded,
               backgroundColor: Colors.white.withValues(alpha: 0.08),
-              foregroundColor: const Color(0xFFEF5350),
+              foregroundColor: GroundedTheme.error,
               onTap: _isSaving ? null : _handleDiscard,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: GroundedTheme.spacing8),
 
             // Tertiary: Continue Editing
             _SheetButton(
@@ -248,10 +251,10 @@ class _SheetButton extends StatelessWidget {
       button: true,
       child: Material(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(GroundedTheme.radiusMedium),
           splashColor: onTap != null ? Colors.white12 : Colors.transparent,
           highlightColor: onTap != null ? Colors.white10 : Colors.transparent,
           child: Opacity(

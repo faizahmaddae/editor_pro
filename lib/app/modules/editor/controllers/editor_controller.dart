@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pro_image_editor/pro_image_editor.dart';
 import '../../../../generated/locales.g.dart';
 import '../../../core/enums/editing_session_state.dart';
+import '../../../core/theme/grounded_theme.dart';
 import '../../../data/services/canvas_generator.dart';
 import '../../../data/services/export_service.dart';
 import '../../../data/services/project_storage.dart';
@@ -210,6 +211,11 @@ class EditorController extends GetxController {
       _loadStateHistory();
       // No need to set special state - package's canUndo handles this correctly
       // with enableInitialEmptyState: false in ImportEditorConfigs
+    } else if (imagePath.isNotEmpty && originalImagePath == null) {
+      // New image from gallery/camera — eagerly copy to persistent storage
+      // so the clean original survives even if the OS clears the cache
+      // before the user saves.
+      _persistOriginalImage();
     }
   }
   
@@ -230,6 +236,10 @@ class EditorController extends GetxController {
     isLoadingHistory.value = true;
     
     try {
+      // Recover originalImagePath if it points to a dead file but the
+      // expected persistent copy exists (handles cache-cleared scenarios).
+      await _resolveOriginalImagePath();
+
       final file = File(stateHistoryPath!);
       if (await file.exists()) {
         // Read file content as string and parse with ImportStateHistory.fromJson
@@ -268,7 +278,7 @@ class EditorController extends GetxController {
         LocaleKeys.common_error.tr,
         LocaleKeys.editor_error_restore_history.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange.withValues(alpha: 0.8),
+        backgroundColor: GroundedTheme.warning.withValues(alpha: 0.9),
         colorText: Colors.white,
       );
     } catch (e) {
@@ -279,6 +289,60 @@ class EditorController extends GetxController {
     }
   }
   
+  /// Eagerly copy the source image (from camera/gallery cache) to persistent
+  /// storage so the clean original survives cache clears.
+  Future<void> _persistOriginalImage() async {
+    try {
+      projectId ??= ProjectStorage.generateId();
+      final appDir = await getApplicationDocumentsDirectory();
+      final projectsDir = Directory('${appDir.path}/projects');
+      if (!await projectsDir.exists()) {
+        await projectsDir.create(recursive: true);
+      }
+      _cachedProjectsDir = projectsDir.path;
+      final destPath = '${projectsDir.path}/$projectId.original.png';
+      // Skip if already persisted (e.g. second call from save flow)
+      if (await File(destPath).exists()) {
+        originalImagePath = destPath;
+        return;
+      }
+      final sourceFile = File(imagePath);
+      if (await sourceFile.exists()) {
+        await sourceFile.copy(destPath);
+        originalImagePath = destPath;
+        debugPrint('>>> Original image persisted early to: $destPath');
+      }
+    } catch (e) {
+      debugPrint('>>> Early persist failed (non-critical): $e');
+    }
+  }
+
+  /// If [originalImagePath] points to a dead file, check if the expected
+  /// persistent copy at `$id.original.png` exists and use it instead.
+  Future<void> _resolveOriginalImagePath() async {
+    if (originalImagePath == null) return;
+    if (File(originalImagePath!).existsSync()) {
+      // Also cache the projects dir for the sync getter
+      if (_cachedProjectsDir == null) {
+        final appDir = await getApplicationDocumentsDirectory();
+        _cachedProjectsDir = '${appDir.path}/projects';
+      }
+      return; // File exists, nothing to fix
+    }
+    // Original path is dead — try the expected persistent location
+    if (projectId != null) {
+      final appDir = await getApplicationDocumentsDirectory();
+      _cachedProjectsDir = '${appDir.path}/projects';
+      final expectedPath = '${_cachedProjectsDir!}/$projectId.original.png';
+      if (File(expectedPath).existsSync()) {
+        originalImagePath = expectedPath;
+        debugPrint('>>> Recovered originalImagePath to: $expectedPath');
+        return;
+      }
+    }
+    debugPrint('>>> originalImagePath unrecoverable: $originalImagePath');
+  }
+
   /// Generates a blank canvas image and sets imagePath
   /// 
   /// This converts blank canvas mode into regular file mode by generating
@@ -464,10 +528,30 @@ class EditorController extends GetxController {
   /// If we have original image and state history, use original image as base
   String get editorImagePath {
     if (originalImagePath != null && loadedStateHistory != null) {
-      return originalImagePath!;
+      if (File(originalImagePath!).existsSync()) {
+        return originalImagePath!;
+      }
+      // Try the expected persistent path as last resort
+      if (projectId != null) {
+        // Synchronous check — _resolveOriginalImagePath should have run
+        // during _loadStateHistory, but this is a safety net.
+        final appDocsPath = _cachedProjectsDir;
+        if (appDocsPath != null) {
+          final expectedPath = '$appDocsPath/$projectId.original.png';
+          if (File(expectedPath).existsSync()) {
+            originalImagePath = expectedPath;
+            debugPrint('>>> editorImagePath: recovered original at $expectedPath');
+            return expectedPath;
+          }
+        }
+      }
+      debugPrint('>>> originalImagePath missing, falling back to imagePath');
     }
     return imagePath;
   }
+
+  /// Cached projects directory path (set by async methods, used by sync getter)
+  String? _cachedProjectsDir;
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SAVE OPERATIONS
@@ -483,7 +567,7 @@ class EditorController extends GetxController {
         LocaleKeys.common_error.tr,
         LocaleKeys.editor_error_no_image.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.8),
+        backgroundColor: GroundedTheme.error.withValues(alpha: 0.9),
         colorText: Colors.white,
       );
       return;
@@ -508,7 +592,7 @@ class EditorController extends GetxController {
         LocaleKeys.common_success.tr,
         LocaleKeys.editor_saved_to_gallery.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withValues(alpha: 0.8),
+        backgroundColor: GroundedTheme.success.withValues(alpha: 0.9),
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
       );
@@ -517,7 +601,7 @@ class EditorController extends GetxController {
         LocaleKeys.common_error.tr,
         LocaleKeys.editor_save_failed.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.8),
+        backgroundColor: GroundedTheme.error.withValues(alpha: 0.9),
         colorText: Colors.white,
         duration: const Duration(seconds: 3),
       );
@@ -569,7 +653,7 @@ class EditorController extends GetxController {
           LocaleKeys.common_success.tr,
           LocaleKeys.export_draft_saved.tr,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withValues(alpha: 0.8),
+          backgroundColor: GroundedTheme.success.withValues(alpha: 0.8),
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
         );
@@ -582,7 +666,7 @@ class EditorController extends GetxController {
           LocaleKeys.common_error.tr,
           LocaleKeys.export_failed.tr,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withValues(alpha: 0.8),
+          backgroundColor: GroundedTheme.error.withValues(alpha: 0.8),
           colorText: Colors.white,
         );
       }
@@ -621,6 +705,7 @@ class EditorController extends GetxController {
       if (!await projectsDir.exists()) {
         await projectsDir.create(recursive: true);
       }
+      _cachedProjectsDir = projectsDir.path;
       
       // Save the full edited image (for thumbnail/preview)
       final editedImagePath = '${projectsDir.path}/$id.png';
@@ -671,13 +756,18 @@ class EditorController extends GetxController {
           // If we already have an original, keep it; otherwise use current imagePath
           savedOriginalImagePath = originalImagePath ?? imagePath;
           
-          // Copy original image if it's not already in projects dir
+          // Ensure the original image is in the persistent projects dir
+          // and actually exists on disk.
+          final originalDestPath = '${projectsDir.path}/$id.original.png';
           if (!savedOriginalImagePath.contains(projectsDir.path)) {
-            final originalDestPath = '${projectsDir.path}/$id.original.png';
+            // Original is outside projects dir (e.g. cache) — copy it in
             final originalFile = File(savedOriginalImagePath);
             if (await originalFile.exists()) {
               await originalFile.copy(originalDestPath);
               savedOriginalImagePath = originalDestPath;
+              // Update in-memory field so subsequent saves use the
+              // persistent path instead of the stale cache path.
+              originalImagePath = originalDestPath;
               debugPrint('>>> Original image copied to: $originalDestPath');
               
               // Clean up temp canvas file if this was a blank canvas
@@ -694,6 +784,27 @@ class EditorController extends GetxController {
                   debugPrint('>>> Failed to clean temp canvas: $e');
                 }
               }
+            } else {
+              // Original source is gone (e.g. cache cleared by OS).
+              // Use the baked edited image as the new baseline so that
+              // future reopens at least have a valid original on disk.
+              final editedFile = File(editedImagePath);
+              if (await editedFile.exists()) {
+                await editedFile.copy(originalDestPath);
+                savedOriginalImagePath = originalDestPath;
+                originalImagePath = originalDestPath;
+                debugPrint('>>> Original missing — promoted baked image to original: $originalDestPath');
+              }
+            }
+          } else if (!await File(savedOriginalImagePath).exists()) {
+            // Path is inside projects dir but file is gone — recover by
+            // promoting the baked image as the new original baseline.
+            final editedFile = File(editedImagePath);
+            if (await editedFile.exists()) {
+              await editedFile.copy(originalDestPath);
+              savedOriginalImagePath = originalDestPath;
+              originalImagePath = originalDestPath;
+              debugPrint('>>> Original in projects dir missing — promoted baked image: $originalDestPath');
             }
           }
         } catch (e) {

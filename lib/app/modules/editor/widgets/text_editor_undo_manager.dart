@@ -32,6 +32,8 @@ class _Snapshot {
 /// Call [capture] whenever the editor state changes (on every reactive rebuild).
 /// It deduplicates consecutive identical snapshots automatically.
 class TextEditorUndoManager extends ChangeNotifier {
+  static const int _maxHistory = 50;
+
   final List<_Snapshot> _history = [];
   int _index = -1;
   bool _isApplying = false;
@@ -61,6 +63,12 @@ class TextEditorUndoManager extends ChangeNotifier {
     }
 
     _history.add(snap);
+
+    // Evict oldest entries when history exceeds the cap.
+    if (_history.length > _maxHistory) {
+      _history.removeAt(0);
+    }
+
     _index = _history.length - 1;
     notifyListeners();
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/grounded_theme.dart';
+
 /// Solid circular icon button used across editor screens.
 ///
 /// Provides a dark circle with a subtle border, matching
@@ -34,15 +36,15 @@ class GlassIconButton extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: 0.12),
+            color: GroundedTheme.glassButtonFill,
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.18),
+              color: GroundedTheme.glassButtonBorder,
               width: 1,
             ),
           ),
           child: Icon(
             icon,
-            color: Colors.white.withValues(alpha: 0.9),
+            color: GroundedTheme.glassIconColor,
             size: iconSize,
           ),
         ),
@@ -50,9 +52,13 @@ class GlassIconButton extends StatelessWidget {
     );
 
     if (tooltip != null && tooltip!.isNotEmpty) {
-      return Tooltip(
-        message: tooltip!,
-        child: button,
+      return Semantics(
+        button: true,
+        label: tooltip!,
+        child: Tooltip(
+          message: tooltip!,
+          child: button,
+        ),
       );
     }
 
